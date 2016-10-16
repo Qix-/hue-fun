@@ -132,6 +132,8 @@ class Animator(object):
             [255, 0, 242]
         ]
 
+        self.fullbright()
+
         while True:
             for lid in self.layoutIds:
                 self.set_light(lid, 'xy', converter.rgbToCIE1931(*ravecolors[random.randint(0, len(ravecolors) - 1)]), transitiontime=0)
