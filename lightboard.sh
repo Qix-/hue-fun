@@ -25,5 +25,4 @@ while read -n1 ans; do
 		*)
 			;;
 	esac
-	${BASE} off_now
 done
