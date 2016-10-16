@@ -19,6 +19,9 @@ while read -n1 ans; do
 		"\`")
 			${BASE} off_now
 			;;
+		r)
+			${BASE} rave
+			;;
 		*)
 			;;
 	esac
