@@ -132,7 +132,7 @@ class Animator(object):
             [255, 0, 242]
         ]
 
-        self.fullbright()
+        self.fullbright_now()
 
         while True:
             for lid in self.layoutIds:
