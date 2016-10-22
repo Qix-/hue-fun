@@ -5,12 +5,14 @@ import random
 import rgb_cie
 import sys
 import time
+import noise
 
 FAILURE_COOLDOWN = 10  # ms
 
+MOOD_COLOR = (0xc9, 0x8c, 0x60)
+
 random.seed()
 converter = rgb_cie.Converter()
-
 
 class Animator(object):
     def __init__(self, bridge, layout, resolution):
@@ -78,6 +80,36 @@ class Animator(object):
             self.set_light(self.layoutIds, 'on', False, transitiontime=0)
             time.sleep(0.1)
 
+    def white(self):
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(255, 255, 255))
+
+    def moody_fast(self):
+        self.moody(increment=1.5)
+
+    def moody(self, increment=0.5):
+        self.fullbright()
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR), transitiontime=3)
+
+        ticker = 0
+
+        while True:
+            ticker += increment
+            for lid in self.layoutIds:
+                valx = lid + math.sin(lid) * 10 + ticker
+                val = noise.pnoise2(valx, ticker) * 254
+                self.set_light(lid, 'bri', int(val), transitiontime=60)
+                time.sleep(0.8)
+
+    def relax(self):
+        self.on_now()
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR))
+        self.fullbright()
+
+    def nite(self):
+        self.on_now()
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR))
+        self.set_light(self.layoutIds, 'bri', 30, transitiontime=60)
+
     def fullbright(self):
         self.on()
         self.set_light(self.layoutIds, 'bri', 254)
@@ -139,6 +171,25 @@ class Animator(object):
                 self.set_light(lid, 'xy', converter.rgbToCIE1931(*ravecolors[random.randint(0, len(ravecolors) - 1)]), transitiontime=0)
                 self.set_light(lid, 'bri', 254, transitiontime=0)
             time.sleep(60 / bpm)
+
+    def blue(self):
+        self.set_light(self.layoutIds, 'on', True)
+        self.set_light(self.layoutIds, 'bri', 254)
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(0, 0, 255))
+
+    def shard(self):
+        colors = [
+            [178, 91, 117],
+            [255, 243, 86],
+            [255, 61, 119],
+            [28, 40, 204],
+            [80, 50, 178]
+        ]
+        index = 0
+        for lid in self.layoutIds:
+            self.set_light(lid, 'on', True)
+            self.set_light(lid, 'xy', converter.rgbToCIE1931(*colors[index]))
+            index = (index + 1) % len(colors)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fun Philips Hue stuff')
