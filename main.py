@@ -108,7 +108,7 @@ class Animator(object):
     def nite(self):
         self.on_now()
         self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR))
-        self.set_light(self.layoutIds, 'bri', 30, transitiontime=60)
+        self.set_light(self.layoutIds, 'bri', 1, transitiontime=60)
 
     def fullbright(self):
         self.on()
