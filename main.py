@@ -105,6 +105,11 @@ class Animator(object):
         self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR))
         self.fullbright()
 
+    def sex(self):
+        self.on_now()
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR))
+        self.set_light(self.layoutIds, 'bri', 80)
+
     def nite(self):
         self.on_now()
         self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(*MOOD_COLOR))
@@ -128,6 +133,7 @@ class Animator(object):
 
     def rainbow(self, factor=1):
         self.on()
+        self.fullbright()
         unit3 = (math.pi * 2) / 3
         unit = (math.pi * 2) / (len(self.layoutIds) * factor)
         t = 0
