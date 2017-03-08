@@ -14,6 +14,7 @@ MOOD_COLOR = (0xc9, 0x8c, 0x60)
 random.seed()
 converter = rgb_cie.Converter()
 
+
 class Animator(object):
     def __init__(self, bridge, layout, resolution):
         self.b = bridge
@@ -26,7 +27,7 @@ class Animator(object):
         try:
             self.b.set_light(*args, **kwargs)
             self.failures = 0
-        except Exception as e:
+        except Exception:
             if self.failures == 2:
                 print 'retry failed; re-throwing exception'
                 raise
@@ -196,6 +197,14 @@ class Animator(object):
             self.set_light(lid, 'on', True)
             self.set_light(lid, 'xy', converter.rgbToCIE1931(*colors[index]))
             index = (index + 1) % len(colors)
+
+    def tv(self):
+        self.on()
+        for i in range(0, 3):
+            self.set_light(self.layoutIds[i], 'bri', 200)
+        for i in range(3, 5):
+            self.set_light(self.layoutIds[i], 'bri', 80)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fun Philips Hue stuff')
