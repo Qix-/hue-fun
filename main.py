@@ -6,6 +6,10 @@ import rgb_cie
 import sys
 import time
 import noise
+import re
+import logging
+
+#logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s %(levelname)s %(name)s] %(message)s')
 
 FAILURE_COOLDOWN = 10  # ms
 
@@ -234,13 +238,24 @@ class Animator(object):
             self.set_light(self.layoutIds[i], 'bri', 80)
 
 
+HEX_PATTERN = re.compile(r'^\s*#?([a-f0-9]{6})\s*$', re.I)
+
+
+def hex_to_rgb(hexval):
+    match = HEX_PATTERN.match(hexval)
+    if match is None:
+        raise Exception('invalid hex code: {}'.format(hexval))
+    dec = int(match.group(1), 16)
+    return [(dec >> 16) & 0xFF, (dec >> 8) & 0xFF, dec & 0xFF]
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fun Philips Hue stuff')
     parser.add_argument('--list', action='store_true', help='List all lights and their IDs')
     parser.add_argument('--layout', help='A comma delimited list of lights to sequence, in order (defualts to whatever Hue gives us)')
     parser.add_argument('--resolution', type=float, default=0.6, help='The amount of time between frames. High resolutions (lower amounts) may crash your connection (shouldn\'t hurt anything though).')
     parser.add_argument('bridge_ip', help='The Hue Bridge IP address')
-    parser.add_argument('anim', help='The animation to play')
+    parser.add_argument('anim', type=str, nargs='+', help='The animation to play')
     args = parser.parse_args()
 
     print 'initializing bridge'
@@ -267,5 +282,22 @@ if __name__ == '__main__':
 
     print 'initializing animator'
     ani = Animator(b, layout, args.resolution)
+
+    if len(args.anim) > 1 or args.anim[0].startswith('#'):
+        print 'performing individual light color animation (nargs > 1 or hex)'
+        cur = 0
+        ids = list(ani.layoutIds)
+        random.shuffle(ids)
+        for lightid in ids:
+            color = args.anim[cur]
+            cur = (cur + 1) % len(args.anim)
+            rgb = hex_to_rgb(color)
+            print 'setting light {} to ({},{},{})'.format(lightid, *rgb)
+            ani.set_light([lightid], 'on', True)
+            ani.set_light([lightid], 'bri', 254)
+            ani.set_light([lightid], 'xy', converter.rgbToCIE1931(*rgb))
+
+        sys.exit(0)
+
     print 'beginning animation'
-    getattr(ani, args.anim)()
+    getattr(ani, args.anim[0])()
