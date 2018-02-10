@@ -2,4 +2,4 @@
 
 set -e
 
-python main.py --layout="4,8,6,5,7" --resolution=0.1 192.168.1.122 "$@"
+python main.py --layout="4,8,6,5,7" --resolution=0.1 192.168.86.171 "$@"

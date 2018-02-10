@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
-BASE="python main.py --layout="4,8,6,5,7" --resolution=0.1 192.168.1.122"
+BASE="./lights.sh"
 
 while read -n1 ans; do
 	case $ans in
 		g)
 			${BASE} glitter
+			;;
+		G)
+			${BASE} glitter_rave
 			;;
 		p)
 			${BASE} punch
@@ -21,6 +24,9 @@ while read -n1 ans; do
 			;;
 		r)
 			${BASE} rave
+			;;
+		R)
+			${BASE} rave_fast
 			;;
 		*)
 			;;

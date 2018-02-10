@@ -11,6 +11,16 @@ FAILURE_COOLDOWN = 10  # ms
 
 MOOD_COLOR = (0xc9, 0x8c, 0x60)
 
+RAVE_COLORS = [
+    [2, 216, 27],
+    [15, 86, 193],
+    [193, 15, 164],
+    [255, 187, 0],
+    [255, 0, 0],
+    [0, 229, 255],
+    [255, 0, 242]
+]
+
 random.seed()
 converter = rgb_cie.Converter()
 
@@ -48,7 +58,7 @@ class Animator(object):
     def off_now(self):
         self.set_light(self.layoutIds, 'on', False, transitiontime=0)
 
-    def strobe_randomly(self, glitter=False):
+    def strobe_randomly(self, glitter=False, rave=False):
         self.on_now()
         self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(255, 255, 255), transitiontime=0)
         self.off_now()
@@ -59,6 +69,8 @@ class Animator(object):
         while True:
             on_lights = set(random.sample(self.layoutIds, random.randint(1, math.ceil(len(self.layoutIds) / 2))))
             self.set_light(on_lights - ons, 'on', True, transitiontime=0)
+            if rave:
+                self.set_light(on_lights - ons, 'xy', converter.rgbToCIE1931(*RAVE_COLORS[random.randint(0, len(RAVE_COLORS) - 1)]), transitiontime=0)
             self.set_light(on_lights - ons, 'bri', 254, transitiontime=0)
             self.set_light((slids - on_lights - offs), 'on', False, transitiontime=0)
             if glitter:
@@ -69,6 +81,9 @@ class Animator(object):
 
     def glitter(self):
         self.strobe_randomly(True)
+
+    def glitter_rave(self):
+        self.strobe_randomly(True, True)
 
     def strobe(self):
         self.on_now()
@@ -161,28 +176,41 @@ class Animator(object):
         self.rainbow(4)
 
     def rave(self, bpm=128):
-        ravecolors = [
-            [2, 216, 27],
-            [15, 86, 193],
-            [193, 15, 164],
-            [255, 187, 0],
-            [255, 0, 0],
-            [0, 229, 255],
-            [255, 0, 242]
-        ]
-
         self.fullbright_now()
 
         while True:
             for lid in self.layoutIds:
-                self.set_light(lid, 'xy', converter.rgbToCIE1931(*ravecolors[random.randint(0, len(ravecolors) - 1)]), transitiontime=0)
+                self.set_light(lid, 'xy', converter.rgbToCIE1931(*RAVE_COLORS[random.randint(0, len(RAVE_COLORS) - 1)]), transitiontime=0)
                 self.set_light(lid, 'bri', 254, transitiontime=0)
             time.sleep(60 / bpm)
+
+    def rave_fast(self):
+        self.rave(bpm=400)
 
     def blue(self):
         self.set_light(self.layoutIds, 'on', True)
         self.set_light(self.layoutIds, 'bri', 254)
         self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(0, 0, 255))
+
+    def red(self):
+        self.set_light(self.layoutIds, 'on', True)
+        self.set_light(self.layoutIds, 'bri', 254)
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(255, 0, 0))
+
+    def purple(self):
+        self.set_light(self.layoutIds, 'on', True)
+        self.set_light(self.layoutIds, 'bri', 254)
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(200, 0, 255))
+
+    def green(self):
+        self.set_light(self.layoutIds, 'on', True)
+        self.set_light(self.layoutIds, 'bri', 254)
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(0, 255, 50))
+
+    def orange(self):
+        self.set_light(self.layoutIds, 'on', True)
+        self.set_light(self.layoutIds, 'bri', 254)
+        self.set_light(self.layoutIds, 'xy', converter.rgbToCIE1931(255, 120, 0))
 
     def shard(self):
         colors = [
